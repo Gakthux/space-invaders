@@ -7,6 +7,8 @@ var ship;
 var rocket;
 var flowers = [];
 var flowerRockets = [];
+var isGameOver = false;
+var score = 0;
 
 function setup() {
   createCanvas(600, 400);
@@ -20,84 +22,94 @@ function setup() {
 }
 
 function draw() {
-  background(30);
-  ship.show();
-  ship.move();
+  if (isGameOver) {
+    textSize(62);
+    text("GAME OVER", width / 6, height / 2);
+  } else {
+    background(30);
+    ship.show();
+    ship.move();
 
-  if (flowers.length == 0) {
-    var shipColorX = random(255);
-    var shipColorY = random(255);
-    var shipColorZ = random(255);
+    textSize(20);
+    text("SCORE : " + score, width / 100, height / 20);
 
-    for (var i = 0; i < 8; i++) {
-      flowers[i] = new Flower(i * 60 + 60, 60, shipColorX, shipColorY, shipColorZ);
-    }
-  }
+    if (flowers.length == 0) {
+      var shipColorX = random(255);
+      var shipColorY = random(255);
+      var shipColorZ = random(255);
 
-  if (rocket) {
-    rocket.show();
-    rocket.move();
-    for (var j = 0; j < flowers.length; j++) {
-      if (rocket.hits(flowers[j])) {
-        flowers[j].destroy();
-        rocket.evaporate();
+      for (var i = 0; i < 8; i++) {
+        flowers[i] = new Flower(i * 60 + 60, 60, shipColorX, shipColorY, shipColorZ);
       }
     }
-  }
 
-  for (var i = 0; i < flowers.length; i++) {
-    var randomNb = random(100);
-    if (randomNb < 1) {
-      var flowerRocket = new FlowerRocket(flowers[i].x, flowers[i].y + flowers[i].r);
-      flowerRockets.push(flowerRocket);
-    }
-  }
-
-  for (var i = 0; i < flowerRockets.length; i++) {
-    flowerRockets[i].show();
-    flowerRockets[i].move();
-    if (flowerRockets[i].y > height) {
-      flowerRockets[i].evaporate();
-    }
-    if (flowerRockets[i].toDelete) {
-      flowerRockets.splice(i, 1);
+    if (rocket) {
+      rocket.show();
+      rocket.move();
+      for (var j = 0; j < flowers.length; j++) {
+        if (rocket.hits(flowers[j])) {
+          flowers[j].destroy();
+          rocket.evaporate();
+        }
+      }
     }
 
-    if (flowerRockets[i] && flowerRockets[i].y + 5 >= height - 60
-      && flowerRockets[i].x >= ship.x - 10
-      && flowerRockets[i].x <= ship.x + 10) {
-      console.log('GAME OVER');
-    }
-  }
-
-  var edge = false;
-
-  for (var i = 0; i < flowers.length; i++) {
-    flowers[i].show();
-    flowers[i].move();
-    if (flowers[i].x + flowers[i].r > width || flowers[i].x - flowers[i].r < 0) {
-      edge = true;
-    }
-  }
-
-  if (edge) {
     for (var i = 0; i < flowers.length; i++) {
-      if (flowers[i].y > 50) {
-        flowers[i].shiftUp();
-      } else {
-        flowers[i].shiftDown();
+      var randomNb = random(100);
+      if (randomNb < 1) {
+        var flowerRocket = new FlowerRocket(flowers[i].x, flowers[i].y + flowers[i].r);
+        flowerRockets.push(flowerRocket);
       }
     }
-  }
 
-  for (var i = flowers.length - 1; i >= 0; i--) {
-    if (flowers[i].toDelete) {
-      flowers.splice(i, 1);
+    for (var i = 0; i < flowerRockets.length; i++) {
+      flowerRockets[i].show();
+      flowerRockets[i].move();
+      if (flowerRockets[i].y > height) {
+        flowerRockets[i].evaporate();
+      }
+      if (flowerRockets[i].toDelete) {
+        flowerRockets.splice(i, 1);
+      }
+
+      if (flowerRockets[i]
+        && flowerRockets[i].y - 15 >= height - 60
+        && flowerRockets[i].x >= ship.x - 10
+        && flowerRockets[i].x <= ship.x + 10) {
+        isGameOver = true;
+      }
     }
-  }
 
-  if ((rocket && rocket.toDelete) || (rocket && rocket.y < 0)) {
-    rocket = null;
+    var edge = false;
+
+    for (var i = 0; i < flowers.length; i++) {
+      flowers[i].show();
+      flowers[i].move();
+      if (flowers[i].x + flowers[i].r > width || flowers[i].x - flowers[i].r < 0) {
+        edge = true;
+      }
+    }
+
+    if (edge) {
+      for (var i = 0; i < flowers.length; i++) {
+        if (flowers[i].y > 50) {
+          flowers[i].shiftUp();
+        } else {
+          flowers[i].shiftDown();
+        }
+      }
+    }
+
+    for (var i = flowers.length - 1; i >= 0; i--) {
+      if (flowers[i].toDelete) {
+        flowers.splice(i, 1);
+        score++;
+      }
+    }
+
+    if ((rocket && rocket.toDelete) || (rocket && rocket.y < 0)) {
+      rocket = null;
+    }
   }
 }
 

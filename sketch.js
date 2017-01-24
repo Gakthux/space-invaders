@@ -7,8 +7,9 @@ var ship;
 var rocket;
 var flowers = [];
 var flowerRockets = [];
-var isGameOver = false;
 var score = 0;
+var level = 1;
+var lifes = 3;
 
 function setup() {
   createCanvas(600, 400);
@@ -22,7 +23,7 @@ function setup() {
 }
 
 function draw() {
-  if (isGameOver) {
+  if (lifes == 0) {
     textSize(62);
     text("GAME OVER", width / 6, height / 2);
   } else {
@@ -30,14 +31,19 @@ function draw() {
     ship.show();
     ship.move();
 
-    textSize(20);
+    textSize(18);
     text("SCORE : " + score, width / 100, height / 20);
+    textSize(18);
+    text("LEVEL : " + level, width - 90, height / 20);
+    textSize(18);
+    text("LIFES : " + lifes, width - 85, height - 15);
 
     if (flowers.length == 0) {
       var shipColorX = random(255);
       var shipColorY = random(255);
       var shipColorZ = random(255);
 
+      level++;
       for (var i = 0; i < 8; i++) {
         flowers[i] = new Flower(i * 60 + 60, 60, shipColorX, shipColorY, shipColorZ);
       }
@@ -56,7 +62,7 @@ function draw() {
 
     for (var i = 0; i < flowers.length; i++) {
       var randomNb = random(100);
-      if (randomNb < 1) {
+      if (randomNb < level / 2) {
         var flowerRocket = new FlowerRocket(flowers[i].x, flowers[i].y + flowers[i].r);
         flowerRockets.push(flowerRocket);
       }
@@ -76,7 +82,8 @@ function draw() {
         && flowerRockets[i].y - 15 >= height - 60
         && flowerRockets[i].x >= ship.x - 10
         && flowerRockets[i].x <= ship.x + 10) {
-        isGameOver = true;
+        flowerRockets[i].evaporate();
+        lifes--;
       }
     }
 
@@ -85,7 +92,7 @@ function draw() {
     for (var i = 0; i < flowers.length; i++) {
       flowers[i].show();
       flowers[i].move();
-      if (flowers[i].x + flowers[i].r > width || flowers[i].x - flowers[i].r < 0) {
+      if (flowers[i].x + flowers[i].r > width - 10 || flowers[i].x - flowers[i].r < 0) {
         edge = true;
       }
     }

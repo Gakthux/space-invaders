@@ -20,7 +20,7 @@ function Ship() {
   }
 
   this.move = function(dir) {
-    if (this.x + this.xdir >= 0 && this.x + this.xdir <= 600)
+    if (this.x + this.xdir >= this.shipWidth / 2 && this.x + this.xdir <= width - this.shipWidth / 2)
       this.x += this.xdir;
   }
 
